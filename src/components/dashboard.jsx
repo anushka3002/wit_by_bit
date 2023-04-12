@@ -1,5 +1,8 @@
 import React from "react";
 import School from "../images/school";
+import StudentModal from "./studentModal";
+import {useRecoilState, useRecoilValue} from "recoil";
+import { modalState, studentData } from "../recoil/atoms/studentAtoms";
 
 const Dashboard = () => {
   const array = [
@@ -12,6 +15,11 @@ const Dashboard = () => {
     { name: "Live Classes", image: "./live.png" },
     { name: "Notifications", image: "./notifications.png" },
   ];
+
+  const [isModalOpen, setIsModalOpen] = useRecoilState(modalState)
+  const studentsData = useRecoilValue(studentData);
+  console.log(studentsData,"student data in dashboard")
+
   return (
     <div className="w-full flex pr-[24px] mt-5">
       {/* sidebar */}
@@ -37,10 +45,12 @@ const Dashboard = () => {
         </div>
       </div>
       {/* table */}
+      <StudentModal/>
+
       <div className=" w-full ml-6">
         <div className="flex justify-between">
           <p className="text-[20px] font-bold">Students</p>
-          <button className="text-white flex px-7 justify-between py-2 bg-[#2CA4D8] rounded-[10px]">
+          <button onClick={()=>setIsModalOpen(true)} className="text-white flex px-7 justify-between py-2 bg-[#2CA4D8] rounded-[10px]">
             <img
               className="my-auto w-[14px] h-[14px] mr-1"
               src="./add.png"
@@ -60,14 +70,19 @@ const Dashboard = () => {
             </tr>
           </thead>
           <tbody>
-            <tr className="">
-              <td className="py-2 text-[14px]">1</td>
-              <td className="text-[14px]">Robert Fox</td>
-              <td>6th</td>
-              <td>Passed</td>
-              <td>78/100</td>
-              <td>Excellent</td>
-            </tr>
+            {studentsData.map((e,index)=>{
+              return(
+              <tr className="">
+              <td className="py-2 text-[14px]">{index+1}</td>
+              <td className="text-[14px]">{e.name}</td>
+              <td>{e.class}</td>
+              <td>{e.result}</td>
+              <td>{e.score}</td>
+              <td>{e.grade}</td>
+            </tr> 
+              )
+            })}
+            {/* */}
           </tbody>
         </table>
       </div>
