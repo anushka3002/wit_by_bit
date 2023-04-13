@@ -6,24 +6,59 @@ import {
   ModalHeader,
   ModalBody,
 } from "@chakra-ui/react";
-import { modalState, studentData } from "../recoil/atoms/studentAtoms";
+import { inputModalState, itemToRemove, studentData } from "../recoil/atoms/studentAtoms";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {useForm} from "react-hook-form";
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as Yup from 'yup';
+import { generateUID } from "./uuid/utils";
 
 const StudentModal = () => {
-  const modalOpen = useRecoilValue(modalState);
-  const [isModalOpen, setIsModalOpen] = useRecoilState(modalState)
+  const modalOpen = useRecoilValue(inputModalState);
+  const [isModalOpen, setIsModalOpen] = useRecoilState(inputModalState)
   const [scoreColor,setScoreColor] = useState("black")
   const [_, setStudentData] = useRecoilState(studentData);
+  const itemToRemoveValue = useRecoilValue(itemToRemove);
+
+  const validationSchema = Yup.object().shape({
+    name: Yup.string().required("Error: Name field cannot be left blank"),
+    class: Yup.number()
+      .typeError("Error: Please input values between 1 & 12")
+      .integer("Error: Please input values between 1 & 12")
+      .min(1, "Error: Please input values between 1 & 12")
+      .max(12, "Error: Please input values between 1 & 12")
+      .required("Error: Class field cannot be left blank"),
+      // .transform((value, originalValue) =>
+      //   originalValue.trim() === "" ? NaN : value
+      // ),
+    score: Yup.number()
+      .typeError("Error: Please input values between 0 & 100")
+      .min(0, "Error: Please input values between 0 & 100")
+      .max(100, "Error: Please input values between 0 & 100")
+      .required("Error: Score field cannot be left blank")
+      // .transform((value, originalValue) =>
+      //   originalValue.trim() === "" ? NaN : value
+      // ),
+  });
+
+  const formOptions = { resolver: yupResolver(validationSchema) };
+
+  const defaultValues = itemToRemoveValue;
 
   const {
     register,
     handleSubmit,
     watch,
-    setValue
-  } = useForm();
+    setValue,
+    formState: { errors },
+    reset
+  } = useForm({
+    defaultValues,
+    ...formOptions
+  });
 
   const score = watch("score")
+  const student_class = watch("class")
 
   useEffect(()=>{
     if(score>=0 && score<= 30){
@@ -41,11 +76,16 @@ const StudentModal = () => {
     }
   },[score,setValue])
 
+  useEffect(()=>{
+    reset(itemToRemoveValue)
+  },[itemToRemoveValue])
+
   const onSubmit=(data)=>{
     console.log(data,"data")
     setStudentData((prev) => [
       ...prev,
       {
+        id:generateUID(),
         name: data.name,
         class: data.class,
         score: data.score,
@@ -53,6 +93,26 @@ const StudentModal = () => {
         grade:data.grade
       }
     ]);
+    setIsModalOpen(false)
+    setValue("name","")
+    setValue("class","")
+    setValue("score","")
+    setValue("result","")
+    setValue("grade","")
+  }
+
+  const onEdit = (data) =>{
+    console.log(data,"data edit")
+    // reset(data)
+    setIsModalOpen(false)
+    setStudentData(prev=>{
+      return prev.map(student=>{
+        if(student.id === data.id){
+          return data
+        }
+        return student;
+      })
+    })
   }
 
   return (
@@ -93,10 +153,15 @@ const StudentModal = () => {
                       STUDENT NAME*
                     </label>
                     <input
+                    // value={itemToRemoveValue.name}
+                    // onChange={(e)=>setValue("name",e.target.value)}
                     {...register("name")}
                       className="border rounded-[5px] w-full focus:outline-none px-[14px] py-[4px]"
                       type="text"
                     />
+                    <p class="text-red-500 text-xs italic">
+                      {errors.name?.message}
+                    </p>
                   </div>
                   <div class="mb-6">
                     <label
@@ -108,10 +173,10 @@ const StudentModal = () => {
                     <input
                     {...register("class")}
                       className="border rounded-[5px] w-full focus:outline-none px-[14px] py-[4px]"
-                      type="text"
+                      type="number"
                     />
-                    <p class="text-red-500 text-xs italic">
-                      Please input values between 1 & 12
+                    <p class={`${student_class ? "text-red-500" : "text-[#666A6C]"} text-xs italic`}>
+                    {student_class ? errors.class?.message : "Please enter values between 1 & 12"}
                     </p>
                   </div>
                   <div class="mb-6">
@@ -127,8 +192,8 @@ const StudentModal = () => {
                       className="border rounded-[5px] w-full focus:outline-none px-[14px] py-[4px]"
                       type="number"
                     />
-                    <p class="text-red-500 text-xs italic">
-                      Please input values between 0 & 100
+                    <p class={`${score ? "text-red-500" : "text-[#666A6C]"} text-xs italic`}>
+                      {score ? errors.score?.message : "Please enter values between 0 & 100"}
                     </p>
                   </div>
                   <div>
@@ -138,7 +203,7 @@ const StudentModal = () => {
                     <input
                     name="result"
                     {...register("result")}
-                    className={`bg-[${scoreColor}] focus:outline-none mb-2 rounded-[14px] "text-white" text-[12px] font-medium py-[2px] px-2`}
+                    className={`${score>=0 && score<= 30 ? "bg-red-500" :score>=31 && score <=100 ? "bg-[#2CBF6E]" :  "bg-[white]" } focus:outline-none mb-2 rounded-[14px] text-white text-[12px] font-medium py-[2px] px-2`}
                     type="button"
                     ></input>
                   </div>
@@ -149,19 +214,17 @@ const StudentModal = () => {
                     <input
                     name="grade"
                     {...register("grade")}
-                    className={`text-[${scoreColor}] mb-2 text-[14px] font-medium`}
+                    className={`${score>=0 && score<= 30 ? "text-red-500" :score>=31 && score <=75 ? "text-[#2CA4D8]" :score>=76 ?  "text-[#2CBF6E]" : "text-black" } mb-2 text-[14px] font-medium`}
                     type="button"
                     ></input>
                   </div>
                   <hr className="my-[16px]"></hr>
                   <div className="flex justify-end">
                     <div>
-                      <button onClick={()=>setIsModalOpen(false)} className="border border-[#2CA4D8] text-[#2CA4D8] tracking-wider text-[14px] font-medium py-[6px] px-8 rounded-[10px]">
-                        CANCEL
-                      </button>
-                      <button type="submit" onClick={()=>setIsModalOpen(false)} className="border bg-[#2CA4D8] text-white text-[14px] tracking-wider font-medium py-[6px] px-8 ml-5 rounded-[10px]">
-                        CONFIRM
-                      </button>
+                      <input type="button" value="CANCEL" onClick={()=>setIsModalOpen(false)} className="cursor-pointer border border-[#2CA4D8] text-[#2CA4D8] tracking-wider text-[14px] font-medium py-[6px] px-8 rounded-[10px]">
+                      </input>
+                      <input value="CONFIRM" type="submit" className={`border ${errors.score || errors.class || errors.name ? "bg-[#A8B4B9] cursor-not-allowed" : "bg-[#2CA4D8] cursor-pointer"} text-white text-[14px] tracking-wider font-medium py-[6px] px-8 ml-5 rounded-[10px]`}>
+                      </input>
                     </div>
                   </div>
                 </form>

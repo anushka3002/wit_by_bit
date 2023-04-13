@@ -1,8 +1,18 @@
 import {atom} from "recoil";
 
-export const modalState = atom({
-    key:"modalState",
+export const inputModalState = atom({
+    key:"inputModalState",
     default:false
+})
+
+export const deleteModalState = atom({
+  key:"deleteModalState",
+  default:false
+})
+
+export const itemToRemove = atom({
+  key:"itemToRemove",
+  default:null
 })
 
 export const studentData = atom({
