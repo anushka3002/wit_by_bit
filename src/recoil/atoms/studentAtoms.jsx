@@ -20,6 +20,11 @@ export const editFormFlag = atom({
   default:false
 })
 
+export const schoolRoute = atom({
+  key:"schoolRoute",
+  default:""
+})
+
 export const studentData = atom({
     key: "studentData",
     default: [],

@@ -60,7 +60,6 @@ const StudentModal = () => {
 
   const score = watch("score")
   const student_class = watch("class")
-  console.log(editFormFlagVal,"edit form flag")
 
   useEffect(()=>{
     if(score>=0 && score<= 30){
@@ -103,7 +102,6 @@ const StudentModal = () => {
   }
 
   const onEdit = (data) =>{
-    console.log(data,"data edit")
     reset(data)
     setIsModalOpen(false)
     setStudentData(prev=>{
@@ -115,8 +113,6 @@ const StudentModal = () => {
       })
     })
   }
-
-  console.log(studentDataList,"st data of console.log")
 
   return (
     <>
