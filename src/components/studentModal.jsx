@@ -16,7 +16,6 @@ import { generateUID } from "./uuid/utils";
 const StudentModal = () => {
   const modalOpen = useRecoilValue(inputModalState);
   const [isModalOpen, setIsModalOpen] = useRecoilState(inputModalState)
-  const [scoreColor,setScoreColor] = useState("black")
   const [studentDataList, setStudentData] = useRecoilState(studentData);
   const itemToRemoveValue = useRecoilValue(itemToRemove);
   const editFormFlagVal = useRecoilValue(editFormFlag);
@@ -29,17 +28,11 @@ const StudentModal = () => {
       .min(1, "Error: Please input values between 1 & 12")
       .max(12, "Error: Please input values between 1 & 12")
       .required("Error: Class field cannot be left blank"),
-      // .transform((value, originalValue) =>
-      //   originalValue.trim() === "" ? NaN : value
-      // ),
     score: Yup.number()
       .typeError("Error: Please input values between 0 & 100")
       .min(0, "Error: Please input values between 0 & 100")
       .max(100, "Error: Please input values between 0 & 100")
       .required("Error: Score field cannot be left blank")
-      // .transform((value, originalValue) =>
-      //   originalValue.trim() === "" ? NaN : value
-      // ),
   });
 
   const formOptions = { resolver: yupResolver(validationSchema) };
@@ -52,7 +45,8 @@ const StudentModal = () => {
     watch,
     setValue,
     formState: { errors },
-    reset
+    reset,
+    clearErrors
   } = useForm({
     defaultValues,
     ...formOptions
@@ -62,18 +56,21 @@ const StudentModal = () => {
   const student_class = watch("class")
 
   useEffect(()=>{
-    if(score>=0 && score<= 30){
+    if(score>=0 && score<= 30 && score.length>0){
+      console.log("je")
       setValue("result","Failed")
       setValue("grade","Poor")
-      setScoreColor("red")
     } else if(score>=31 && score <=75 ){
       setValue("result","Passed")
       setValue("grade","Average")
-      setScoreColor("#f78800")
     }else if(score>=76){
       setValue("result","Passed")
       setValue("grade","Excellent")
-      setScoreColor("#2CBF6E")
+    }
+    else if(score.length==0){
+      console.log("hey")
+      setValue("result","-")
+      setValue("grade","-")
     }
   },[score,setValue])
 
@@ -112,7 +109,25 @@ const StudentModal = () => {
         return student;
       })
     })
+    setValue("name","")
+    setValue("class","")
+    setValue("score","")
+    setValue("result","-")
+    setValue("grade","-")
+    clearErrors("name")
   }
+
+  const handleCancel=()=>{
+    setIsModalOpen(false)
+    setValue("name","")
+    setValue("class","")
+    setValue("score","")
+    setValue("result","-")
+    setValue("grade","-")
+    clearErrors("name")
+  }
+
+  console.log(score.length,score==0,"score")
 
   return (
     <>
@@ -199,7 +214,7 @@ const StudentModal = () => {
                     <input
                     name="result"
                     {...register("result")}
-                    className={`${score>=0 && score<= 30 ? "bg-red-500" :score>=31 && score <=100 ? "bg-[#2CBF6E]" :  "bg-[white]" } focus:outline-none mb-2 rounded-[14px] text-white text-[12px] font-medium py-[2px] px-2`}
+                    className={`${score>=0 && score<= 30 && score.length>0 ? "bg-red-500 text-white" :score>=31 && score <=100 ? "bg-[#2CBF6E] text-white" : "bg-[white] text-black" } focus:outline-none mb-2 rounded-[14px] text-[12px] font-medium py-[2px] px-2`}
                     type="button"
                     ></input>
                   </div>
@@ -210,14 +225,14 @@ const StudentModal = () => {
                     <input
                     name="grade"
                     {...register("grade")}
-                    className={`${score>=0 && score<= 30 ? "text-red-500" :score>=31 && score <=75 ? "text-[#2CA4D8]" :score>=76 ?  "text-[#2CBF6E]" : "text-black" } mb-2 text-[14px] font-medium`}
+                    className={`${score>=0 && score<= 30 && score.length>0 ? "text-red-500" :score>=31 && score <=75 ? "text-[#2CA4D8]" :score>=76 ?  "text-[#2CBF6E]" : "text-black px-2" } mb-2 text-[14px] font-medium`}
                     type="button"
                     ></input>
                   </div>
                   <hr className="my-[16px]"></hr>
                   <div className="flex justify-end">
                     <div>
-                      <input type="button" value="CANCEL" onClick={()=>setIsModalOpen(false)} className="cursor-pointer border border-[#2CA4D8] text-[#2CA4D8] tracking-wider text-[14px] font-medium py-[6px] px-8 rounded-[10px]">
+                      <input type="button" value="CANCEL" onClick={handleCancel} className="cursor-pointer border border-[#2CA4D8] text-[#2CA4D8] tracking-wider text-[14px] font-medium py-[6px] px-8 rounded-[10px]">
                       </input>
                       <input value="CONFIRM" type="submit" className={`border ${errors.score || errors.class || errors.name ? "bg-[#A8B4B9] cursor-not-allowed" : "bg-[#2CA4D8] cursor-pointer"} text-white text-[14px] tracking-wider font-medium py-[6px] px-8 ml-5 rounded-[10px]`}>
                       </input>

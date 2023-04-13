@@ -1,14 +1,11 @@
-import React, { useEffect, useState } from "react";
-import School from "../images/school";
+import React, { useState } from "react";
 import StudentModal from "./studentModal";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { useNavigate } from "react-router-dom";
 import {
   deleteModalState,
   editFormFlag,
   inputModalState,
   itemToRemove,
-  schoolRoute,
   studentData,
 } from "../recoil/atoms/studentAtoms";
 import Edit from "../images/edit";
@@ -22,21 +19,16 @@ const Dashboard = () => {
     useRecoilState(deleteModalState);
   const studentsData = useRecoilValue(studentData);
   const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
-  const [hoveredDashboardIndex, setHoveredDashboardIndex] = useState(null);
   const [editFormFlagVal, setEditFormFlag] = useRecoilState(editFormFlag);
-  const [schoolPageRoute, setSchoolPageRoute] = useRecoilState(schoolRoute);
   const modalOpen = useRecoilValue(deleteModalState);
   const [_, setStudentData] = useRecoilState(studentData);
   const [itemToRemoveValue, setItemToRemoveValue] =
     useRecoilState(itemToRemove);
-  const [imageBlue, setImageBlue] = useState(false);
 
   const removeData = () => {
     setStudentData(studentsData.filter((data) => data !== itemToRemoveValue));
     setIsDeleteModalOpen(false);
   };
-
-  console.log(schoolPageRoute,"page route")
 
   return (
     <div className="w-full mr-6 pr-[24px] pt-4 bg-[#f9fcfe]">
@@ -61,7 +53,8 @@ const Dashboard = () => {
             <p className="text-[14px] font-medium">ADD</p>
           </button>
         </div>
-        <div className="h-[440px] border bg-white text-center">
+        <div className="h-[445px] border bg-white text-center">
+          {console.log(studentData.length,"l")}          
         <table className="table-auto w-full border rounded-[10px]">
           <thead className="bg-[#f1f4f8] border">
             <tr className="text-[14px] font-medium">
@@ -146,6 +139,7 @@ const Dashboard = () => {
             })}
           </tbody>
         </table>
+        {studentsData.length==0 && <p className="text-[35px] text-[#d4d4d4] text-center pt-40 font-bold">Add Data</p>}
         </div>
         <p className="text-[12px] py-4">Showing {studentsData.length} of {studentsData.length} entries</p>
       </div>
