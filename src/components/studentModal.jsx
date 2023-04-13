@@ -6,7 +6,7 @@ import {
   ModalHeader,
   ModalBody,
 } from "@chakra-ui/react";
-import { inputModalState, itemToRemove, studentData } from "../recoil/atoms/studentAtoms";
+import { editFormFlag, inputModalState, itemToRemove, studentData } from "../recoil/atoms/studentAtoms";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {useForm} from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -17,8 +17,9 @@ const StudentModal = () => {
   const modalOpen = useRecoilValue(inputModalState);
   const [isModalOpen, setIsModalOpen] = useRecoilState(inputModalState)
   const [scoreColor,setScoreColor] = useState("black")
-  const [_, setStudentData] = useRecoilState(studentData);
+  const [studentDataList, setStudentData] = useRecoilState(studentData);
   const itemToRemoveValue = useRecoilValue(itemToRemove);
+  const editFormFlagVal = useRecoilValue(editFormFlag);
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Error: Name field cannot be left blank"),
@@ -59,6 +60,7 @@ const StudentModal = () => {
 
   const score = watch("score")
   const student_class = watch("class")
+  console.log(editFormFlagVal,"edit form flag")
 
   useEffect(()=>{
     if(score>=0 && score<= 30){
@@ -81,7 +83,6 @@ const StudentModal = () => {
   },[itemToRemoveValue])
 
   const onSubmit=(data)=>{
-    console.log(data,"data")
     setStudentData((prev) => [
       ...prev,
       {
@@ -103,7 +104,7 @@ const StudentModal = () => {
 
   const onEdit = (data) =>{
     console.log(data,"data edit")
-    // reset(data)
+    reset(data)
     setIsModalOpen(false)
     setStudentData(prev=>{
       return prev.map(student=>{
@@ -114,6 +115,8 @@ const StudentModal = () => {
       })
     })
   }
+
+  console.log(studentDataList,"st data of console.log")
 
   return (
     <>
@@ -140,11 +143,10 @@ const StudentModal = () => {
             <ModalHeader>
               <p className="text-[18px] font-medium mb-[16px]">Add student</p>
             </ModalHeader>
-            {/* <ModalCloseButton /> */}
             <ModalBody>
               <hr className="pb-[16px]"></hr>
               <div class="w-full">
-                <form onSubmit={handleSubmit(onSubmit)} class="bg-white rounded">
+                <form onSubmit={handleSubmit(editFormFlagVal ? onEdit : onSubmit)} class="bg-white rounded">
                   <div class="mb-4">
                     <label
                       class="block text-[12px] text-[#7F878A] mb-2 tracking-wider"
@@ -153,8 +155,6 @@ const StudentModal = () => {
                       STUDENT NAME*
                     </label>
                     <input
-                    // value={itemToRemoveValue.name}
-                    // onChange={(e)=>setValue("name",e.target.value)}
                     {...register("name")}
                       className="border rounded-[5px] w-full focus:outline-none px-[14px] py-[4px]"
                       type="text"

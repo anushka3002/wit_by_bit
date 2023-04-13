@@ -15,6 +15,11 @@ export const itemToRemove = atom({
   default:null
 })
 
+export const editFormFlag = atom({
+  key:"editFormFlag",
+  default:false
+})
+
 export const studentData = atom({
     key: "studentData",
     default: [],

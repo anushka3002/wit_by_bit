@@ -4,6 +4,7 @@ import StudentModal from "./studentModal";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {
   deleteModalState,
+  editFormFlag,
   inputModalState,
   itemToRemove,
   studentData,
@@ -11,17 +12,18 @@ import {
 import Edit from "../images/edit";
 import Delete from "../images/delete";
 import DeleteModal from "./deleteModal";
+import { DashboardIcon, DashboardIconGrey, CourseBook, CourseBookGrey , Exams, ExamsGrey, LiveStreaming, LiveStreamingGrey, NoticeBoard, NoticeBoardGrey, Notifications, NotificationsGrey, Results, ResultsGrey, Students, StudentsGrey } from "../images/SvgImages";
 
 const Dashboard = () => {
   const sidebarContent = [
-    { name: "Dashboard", image: "./dashboard.png" },
-    { name: "Courses", image: "./courses.png" },
-    { name: "Students", image: "./students.png" },
-    { name: "Exams", image: "./exams.png" },
-    { name: "Results", image: "./results.png" },
-    { name: "Notice Board", image: "./notice.png" },
-    { name: "Live Classes", image: "./live.png" },
-    { name: "Notifications", image: "./notifications.png" },
+    { name: "Dashboard", imageGrey: <DashboardIconGrey/>, imageBlue : <DashboardIcon/> },
+    { name: "Courses", imageGrey: <CourseBookGrey/> ,imageBlue : <CourseBook/> },
+    { name: "Students", imageGrey: <StudentsGrey/>, imageBlue : <Students/> },
+    { name: "Exams", imageGrey: <ExamsGrey/>, imageBlue : <Exams/> },
+    { name: "Results", imageGrey: <ResultsGrey/>, imageBlue : <Results/> },
+    { name: "Notice Board", imageGrey: <NoticeBoardGrey/> , imageBlue : <NoticeBoard/>},
+    { name: "Live Classes", imageGrey: <LiveStreamingGrey/> , imageBlue : <LiveStreaming/>},
+    { name: "Notifications", imageGrey: <NotificationsGrey/>, imageBlue : <Notifications/> },
   ];
 
   const [isInputModalOpen, setInputIsModalOpen] =
@@ -30,11 +32,12 @@ const Dashboard = () => {
     useRecoilState(deleteModalState);
   const studentsData = useRecoilValue(studentData);
   const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
+  const [hoveredDashboardIndex, setHoveredDashboardIndex] = useState(null)
+  const [editFormFlagVal, setEditFormFlag] = useRecoilState(editFormFlag);
   const modalOpen = useRecoilValue(deleteModalState);
   const [_, setStudentData] = useRecoilState(studentData);
   const [itemToRemoveValue, setItemToRemoveValue] = useRecoilState(itemToRemove);
-
-  console.log(studentsData,"st data")
+  const [imageBlue,setImageBlue] = useState(false)
 
   const removeData = () => {
     setStudentData(studentsData.filter((data) => data !== itemToRemoveValue));
@@ -42,37 +45,40 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="w-full flex pr-[24px] mt-5">
+    <div className="w-full flex pr-[24px]">
       {/* sidebar */}
-      <div className="w-[24%] shadow-2xl pl-[24px] h-screen">
-        <div className="flex w-[240px] justify-between mb-[20px]">
+      <div className="w-[25%] shadow-2xl px-[24px] h-screen border pt-5">
+        <div className="flex justify-between mb-[20px]">
           <div className="bg-[#FFBF3F] p-4 rounded-[8px] w-[60px] h-[48px]">
             <div className="mb-2 mx-auto mt-[-10px] flex flex-cols justify-center">
               <School />
             </div>
           </div>
-          <p className="SchoolSpace font-bold text-[25px]">School Space</p>
+          <p className="SchoolSpace font-bold text-[22px]">School Space</p>
         </div>
         <hr></hr>
         <div className="mt-[11px]">
-          {sidebarContent.map((e) => {
+          {sidebarContent.map((e,index) => {
+             const isDashboardHovered = hoveredDashboardIndex === index;
             return (
-              <div className="flex cursor-pointer pl-3 mr-7 rounded-[18px] hover:bg-[#eaf6fc] py-[11px] hover:text-[16px] hover:font-medium hover:text-[#2CA4D8]">
-                <img className="w-[24px] h-[24px]" src={e.image}></img>
-                <p className="ml-5">{e.name}</p>
+              <div onMouseEnter={() => setHoveredDashboardIndex(index)}
+              onMouseLeave={() => setHoveredDashboardIndex(null)} className={`flex cursor-pointer pl-3 mr-7 rounded-[18px] hover:bg-[#eaf6fc] py-[10px] hover:text-[16px] hover:font-medium hover:text-[#2CA4D8]`}>
+                {isDashboardHovered ? <span>{e.imageBlue}</span> : <span>{e.imageGrey}</span>}
+                <p className={`ml-5 text-[14px]`}>{e.name}</p>
               </div>
             );
           })}
         </div>
       </div>
-      {/* table */}
+      {/* modals */}
       <StudentModal itemToRemoveValue={itemToRemoveValue}/>
       <DeleteModal removeData={removeData} />
+      {/* table */}
       <div className=" w-full ml-6">
         <div className="flex justify-between">
           <p className="text-[20px] font-bold">Students</p>
           <button
-            onClick={() => setInputIsModalOpen(true)}
+            onClick={() => {setInputIsModalOpen(true);setEditFormFlag(false)}}
             className="text-white flex px-7 justify-between py-2 bg-[#2CA4D8] rounded-[10px]"
           >
             <img
@@ -98,7 +104,6 @@ const Dashboard = () => {
           <tbody>
             {studentsData.map((e, index) => {
               const isHovered = hoveredRowIndex === index;
-
               return (
                 <>
                   <tr
@@ -140,7 +145,7 @@ const Dashboard = () => {
                     </td>
                     <td>
                       <span
-                      onClick={() => {setInputIsModalOpen(true);setItemToRemoveValue(e)}}
+                      onClick={() => {setInputIsModalOpen(true);setItemToRemoveValue(e);setEditFormFlag(true)}}
                         className={`${isHovered ? "visible" : "invisible"}`}
                       >
                         <Edit />

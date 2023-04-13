@@ -13,9 +13,7 @@ const DeleteModal = ({ removeData }) => {
   const modalOpen = useRecoilValue(deleteModalState);
   const itemToRemoveValue = useRecoilValue(itemToRemove);
   const [isModalOpen, setIsModalOpen] = useRecoilState(deleteModalState);
-
-  console.log(modalOpen);
-
+  
   return (
     <div>
       <Modal
