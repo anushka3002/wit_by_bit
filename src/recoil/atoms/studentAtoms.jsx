@@ -22,7 +22,12 @@ export const editFormFlag = atom({
 
 export const schoolRoute = atom({
   key:"schoolRoute",
-  default:""
+  default:"Students"
+})
+
+export const clearFormValues = atom({
+  key:"clearFormValues",
+  default:()=>()=>console.log('Clear form function'),
 })
 
 export const studentData = atom({

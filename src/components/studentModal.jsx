@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -6,8 +6,8 @@ import {
   ModalHeader,
   ModalBody,
 } from "@chakra-ui/react";
-import { editFormFlag, inputModalState, itemToRemove, studentData } from "../recoil/atoms/studentAtoms";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { clearFormValues, editFormFlag, inputModalState, itemToRemove, studentData } from "../recoil/atoms/studentAtoms";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {useForm} from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
@@ -19,6 +19,8 @@ const StudentModal = () => {
   const [studentDataList, setStudentData] = useRecoilState(studentData);
   const itemToRemoveValue = useRecoilValue(itemToRemove);
   const editFormFlagVal = useRecoilValue(editFormFlag);
+  // const setClearFormFunction = useSetRecoilState(clearFormValues)
+  const clearFormFlag = useRecoilValue(clearFormValues)
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Error: Name field cannot be left blank"),
@@ -54,21 +56,21 @@ const StudentModal = () => {
 
   const score = watch("score")
   const student_class = watch("class")
+  const result = watch("result")
+  const grade = watch("grade")
 
   useEffect(()=>{
     if(score>=0 && score<= 30 && score.length>0){
-      console.log("je")
       setValue("result","Failed")
       setValue("grade","Poor")
     } else if(score>=31 && score <=75 ){
       setValue("result","Passed")
       setValue("grade","Average")
-    }else if(score>=76){
+    }else if(score>=76 && score<=100){
       setValue("result","Passed")
       setValue("grade","Excellent")
     }
-    else if(score.length==0){
-      console.log("hey")
+    else if(score?.length==0 || score>100){
       setValue("result","-")
       setValue("grade","-")
     }
@@ -77,6 +79,22 @@ const StudentModal = () => {
   useEffect(()=>{
     reset(itemToRemoveValue)
   },[itemToRemoveValue])
+
+  const clearForm = () =>{
+    console.log("clear ho rha")
+    setValue("name","")
+    setValue("class","")
+    setValue("score","")
+    setValue("result","-")
+    setValue("grade","-")
+    clearErrors("name")
+  }
+
+  useEffect(()=>{
+    console.log(clearFormFlag,"clear the values")
+    clearFormFlag && clearForm()
+  },[clearFormFlag])
+
 
   const onSubmit=(data)=>{
     setStudentData((prev) => [
@@ -91,11 +109,7 @@ const StudentModal = () => {
       }
     ]);
     setIsModalOpen(false)
-    setValue("name","")
-    setValue("class","")
-    setValue("score","")
-    setValue("result","")
-    setValue("grade","")
+    clearForm()
   }
 
   const onEdit = (data) =>{
@@ -109,25 +123,12 @@ const StudentModal = () => {
         return student;
       })
     })
-    setValue("name","")
-    setValue("class","")
-    setValue("score","")
-    setValue("result","-")
-    setValue("grade","-")
-    clearErrors("name")
   }
 
   const handleCancel=()=>{
     setIsModalOpen(false)
-    setValue("name","")
-    setValue("class","")
-    setValue("score","")
-    setValue("result","-")
-    setValue("grade","-")
-    clearErrors("name")
+    !editFormFlagVal && clearForm()
   }
-
-  console.log(score.length,score==0,"score")
 
   return (
     <>
@@ -214,7 +215,7 @@ const StudentModal = () => {
                     <input
                     name="result"
                     {...register("result")}
-                    className={`${score>=0 && score<= 30 && score.length>0 ? "bg-red-500 text-white" :score>=31 && score <=100 ? "bg-[#2CBF6E] text-white" : "bg-[white] text-black" } focus:outline-none mb-2 rounded-[14px] text-[12px] font-medium py-[2px] px-2`}
+                    className={`${result=="Failed" ? "bg-red-500 text-white" : result=="Passed" ? "bg-[#2CBF6E] text-white" : "bg-[white] text-black" } focus:outline-none mb-2 rounded-[14px] text-[12px] font-medium py-[2px] px-2`}
                     type="button"
                     ></input>
                   </div>
@@ -225,7 +226,7 @@ const StudentModal = () => {
                     <input
                     name="grade"
                     {...register("grade")}
-                    className={`${score>=0 && score<= 30 && score.length>0 ? "text-red-500" :score>=31 && score <=75 ? "text-[#2CA4D8]" :score>=76 ?  "text-[#2CBF6E]" : "text-black px-2" } mb-2 text-[14px] font-medium`}
+                    className={`${result=="Failed" ? "text-red-500" : grade == "Average" ? "text-[#2CA4D8]" : result =="Passed" ? "text-[#2CBF6E]" : "text-black px-2" } mb-2 text-[14px] font-medium`}
                     type="button"
                     ></input>
                   </div>

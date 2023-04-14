@@ -46,7 +46,7 @@ const DeleteModal = ({ removeData }) => {
                 <p className="text-[12px] font-medium text-[#7F878A] mt-6">STUDENT NAME</p>
                 <p className="mt-2 text-[14px]">{itemToRemoveValue?.name}</p>
                 <p className="text-[12px] font-medium text-[#7F878A] mt-4">CLASS</p>
-                <p className="mt-2 text-[14px]">{itemToRemoveValue?.class}th</p>
+                <p className="mt-2 text-[14px]">{itemToRemoveValue?.class}{itemToRemoveValue?.class==1 ? "st" : itemToRemoveValue?.class==2 ? "nd" : itemToRemoveValue?.class==3 ? "rd" : "th"}</p>
                 <hr className="my-6"></hr>
                 <div className="flex justify-end">
                   <input

@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import StudentModal from "./studentModal";
-import { useRecoilState, useRecoilValue } from "recoil";
+import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
+  clearFormValues,
   deleteModalState,
   editFormFlag,
   inputModalState,
@@ -22,13 +23,17 @@ const Dashboard = () => {
   const [editFormFlagVal, setEditFormFlag] = useRecoilState(editFormFlag);
   const modalOpen = useRecoilValue(deleteModalState);
   const [_, setStudentData] = useRecoilState(studentData);
+  const [__,setClearFormFlag] = useRecoilState(clearFormValues)
   const [itemToRemoveValue, setItemToRemoveValue] =
     useRecoilState(itemToRemove);
-
   const removeData = () => {
     setStudentData(studentsData.filter((data) => data !== itemToRemoveValue));
     setIsDeleteModalOpen(false);
   };
+
+  useEffect(()=>{
+    !isDeleteModalOpen && !isInputModalOpen && setHoveredRowIndex(null)
+  },[isDeleteModalOpen,isInputModalOpen])
 
   return (
     <div className="w-full mr-6 pr-[24px] pt-4 bg-[#f9fcfe]">
@@ -43,6 +48,7 @@ const Dashboard = () => {
             onClick={() => {
               setInputIsModalOpen(true);
               setEditFormFlag(false);
+              setClearFormFlag(true);
             }}
             className="text-white flex px-6 justify-between py-2 bg-[#2CA4D8] rounded-[10px]"
           >
@@ -54,7 +60,6 @@ const Dashboard = () => {
           </button>
         </div>
         <div className="h-[445px] border bg-white text-center">
-          {console.log(studentData.length,"l")}          
         <table className="table-auto w-full border rounded-[10px]">
           <thead className="bg-[#f1f4f8] border">
             <tr className="text-[14px] font-medium">
@@ -74,8 +79,9 @@ const Dashboard = () => {
               return (
                 <>
                   <tr
+                  onClick={()=>setHoveredRowIndex(index)}
                     onMouseEnter={() => setHoveredRowIndex(index)}
-                    onMouseLeave={() => setHoveredRowIndex(null)}
+                    onMouseLeave={() => {(isDeleteModalOpen || isInputModalOpen)  ? setHoveredRowIndex(index) : setHoveredRowIndex(null)}}
                     className="border cursor-pointer hover:bg-[#F1F4F8] text-[14px]"
                   >
                     <td className="py-2 text-[#242424]">{index + 1}</td>
@@ -116,6 +122,7 @@ const Dashboard = () => {
                           setInputIsModalOpen(true);
                           setItemToRemoveValue(e);
                           setEditFormFlag(true);
+                          setClearFormFlag(false);
                         }}
                         className={`${isHovered ? "visible" : "invisible"}`}
                       >
