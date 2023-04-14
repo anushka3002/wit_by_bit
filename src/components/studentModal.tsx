@@ -1,26 +1,40 @@
-import React, { useEffect } from "react";
 import {
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
   ModalBody,
+  useDisclosure
 } from "@chakra-ui/react";
-import { clearFormValues, editFormFlag, inputModalState, itemToRemove, studentData } from "../recoil/atoms/studentAtoms";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { clearFormValues, editFormFlag, inputModalState, itemToRemove, studentData } from "../recoil/atoms/studentAtoms.tsx";
+import { useRecoilState, useRecoilValue } from "recoil";
 import {useForm} from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as Yup from 'yup';
-import { generateUID } from "./uuid/utils";
+import { generateUID } from "./uuid/utils.tsx";
+import { useEffect } from "react";
 
-const StudentModal = () => {
+interface StudentDataValue{
+  id?:string;
+  name?: string;
+  class?: number;
+  score?: number;
+  result?: string;
+  grade?:string;
+}
+
+interface StudentModalprops{
+  itemToRemoveValue:StudentDataValue
+}
+
+
+const StudentModal:React.FC<StudentModalprops>= ({itemToRemoveValue}): React.ReactElement => {
   const modalOpen = useRecoilValue(inputModalState);
   const [isModalOpen, setIsModalOpen] = useRecoilState(inputModalState)
-  const [studentDataList, setStudentData] = useRecoilState(studentData);
-  const itemToRemoveValue = useRecoilValue(itemToRemove);
-  const editFormFlagVal = useRecoilValue(editFormFlag);
-  // const setClearFormFunction = useSetRecoilState(clearFormValues)
-  const clearFormFlag = useRecoilValue(clearFormValues)
+  const [studentDataList, setStudentData] = useRecoilState<StudentDataValue[]>(studentData);
+  // const itemToRemoveValue = useRecoilValue<StudentDataValue[]>(itemToRemove);
+  const editFormFlagVal = useRecoilValue<boolean>(editFormFlag);
+  const clearFormFlag = useRecoilValue<boolean>(clearFormValues)
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Error: Name field cannot be left blank"),
@@ -54,13 +68,14 @@ const StudentModal = () => {
     ...formOptions
   });
 
-  const score = watch("score")
-  const student_class = watch("class")
-  const result = watch("result")
-  const grade = watch("grade")
+  const score = watch("score") as number;
+  const student_class = watch("class") as number;
+  const result = watch("result") as string;
+  const grade = watch("grade") as string;
+  const {onClose} = useDisclosure()
 
   useEffect(()=>{
-    if(score>=0 && score<= 30 && score.length>0){
+    if(score>=0 && score<= 30 && score.toString().length>0){
       setValue("result","Failed")
       setValue("grade","Poor")
     } else if(score>=31 && score <=75 ){
@@ -70,7 +85,7 @@ const StudentModal = () => {
       setValue("result","Passed")
       setValue("grade","Excellent")
     }
-    else if(score?.length==0 || score>100){
+    else if(score?.toString().length==0 || score>100){
       setValue("result","-")
       setValue("grade","-")
     }
@@ -81,7 +96,6 @@ const StudentModal = () => {
   },[itemToRemoveValue])
 
   const clearForm = () =>{
-    console.log("clear ho rha")
     setValue("name","")
     setValue("class","")
     setValue("score","")
@@ -91,13 +105,12 @@ const StudentModal = () => {
   }
 
   useEffect(()=>{
-    console.log(clearFormFlag,"clear the values")
     clearFormFlag && clearForm()
   },[clearFormFlag])
 
 
-  const onSubmit=(data)=>{
-    setStudentData((prev) => [
+  const onSubmit=(data:any):void=>{
+    setStudentData((prev:StudentDataValue[]) => [
       ...prev,
       {
         id:generateUID(),
@@ -112,7 +125,7 @@ const StudentModal = () => {
     clearForm()
   }
 
-  const onEdit = (data) =>{
+  const onEdit = (data:any) =>{
     reset(data)
     setIsModalOpen(false)
     setStudentData(prev=>{
@@ -134,12 +147,9 @@ const StudentModal = () => {
     <>
       <Modal
         isCentered
-        padding={"0"}
-        background="[#000000]"
-        width={400}
         size={"lg"}
-        className="z-20"
         isOpen={modalOpen}
+        onClose={onClose}
         closeOnOverlayClick={true}
       >
         <ModalOverlay bg="rgba(0,0,0,0.4)">
@@ -157,12 +167,11 @@ const StudentModal = () => {
             </ModalHeader>
             <ModalBody>
               <hr className="pb-[16px]"></hr>
-              <div class="w-full">
-                <form onSubmit={handleSubmit(editFormFlagVal ? onEdit : onSubmit)} class="bg-white rounded">
-                  <div class="mb-4">
+              <div className="w-full">
+                <form onSubmit={handleSubmit(editFormFlagVal ? onEdit : onSubmit)} className="bg-white rounded">
+                  <div className="mb-4">
                     <label
-                      class="block text-[12px] text-[#7F878A] mb-2 tracking-wider"
-                      for="username"
+                      className="block text-[12px] text-[#7F878A] mb-2 tracking-wider"
                     >
                       STUDENT NAME*
                     </label>
@@ -171,14 +180,13 @@ const StudentModal = () => {
                       className="border rounded-[5px] w-full focus:outline-none px-[14px] py-[4px]"
                       type="text"
                     />
-                    <p class="text-red-500 text-xs italic">
+                    {typeof errors.name?.message === "string" ? <p className="text-red-500 text-xs italic">
                       {errors.name?.message}
-                    </p>
+                    </p> : null}
                   </div>
-                  <div class="mb-6">
+                  <div className="mb-6">
                     <label
-                      class="block text-[12px] text-[#7F878A] mb-2 tracking-wider"
-                      for="username"
+                      className="block text-[12px] text-[#7F878A] mb-2 tracking-wider"
                     >
                       CLASS*
                     </label>
@@ -187,33 +195,32 @@ const StudentModal = () => {
                       className="border rounded-[5px] w-full focus:outline-none px-[14px] py-[4px]"
                       type="number"
                     />
-                    <p class={`${student_class ? "text-red-500" : "text-[#666A6C]"} text-xs italic`}>
+                    {typeof errors.class?.message === "string" ? <p className={`${student_class ? "text-red-500" : "text-[#666A6C]"} text-xs italic`}>
                     {student_class ? errors.class?.message : "Please enter values between 1 & 12"}
-                    </p>
+                    </p> : null}
                   </div>
-                  <div class="mb-6">
+                  <div className="mb-6">
                     <label
-                      class="block text-[12px] text-[#7F878A] mb-2 tracking-wider"
-                      for="username"
+                      className="block text-[12px] text-[#7F878A] mb-2 tracking-wider"
                     >
                       SCORE*
                     </label>
                     <input
-                    name="score"
+                    id="score"
                     {...register("score")}
                       className="border rounded-[5px] w-full focus:outline-none px-[14px] py-[4px]"
                       type="number"
                     />
-                    <p class={`${score ? "text-red-500" : "text-[#666A6C]"} text-xs italic`}>
+                    {typeof errors.score?.message === "string" ? <p className={`${score ? "text-red-500" : "text-[#666A6C]"} text-xs italic`}>
                       {score ? errors.score?.message : "Please enter values between 0 & 100"}
-                    </p>
+                    </p> : null}
                   </div>
                   <div>
                     <p className="block text-[12px] text-[#7F878A] tracking-wider">
                       RESULT
                     </p>
                     <input
-                    name="result"
+                    id="result"
                     {...register("result")}
                     className={`${result=="Failed" ? "bg-red-500 text-white" : result=="Passed" ? "bg-[#2CBF6E] text-white" : "bg-[white] text-black" } focus:outline-none mb-2 rounded-[14px] text-[12px] font-medium py-[2px] px-2`}
                     type="button"
@@ -224,7 +231,7 @@ const StudentModal = () => {
                       Grade
                     </p>
                     <input
-                    name="grade"
+                    id="grade"
                     {...register("grade")}
                     className={`${result=="Failed" ? "text-red-500" : grade == "Average" ? "text-[#2CA4D8]" : result =="Passed" ? "text-[#2CBF6E]" : "text-black px-2" } mb-2 text-[14px] font-medium`}
                     type="button"

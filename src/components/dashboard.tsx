@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import StudentModal from "./studentModal";
+import { useEffect, useState } from "react";
+import StudentModal from "./studentModal.tsx";
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {
   clearFormValues,
@@ -8,26 +8,36 @@ import {
   inputModalState,
   itemToRemove,
   studentData,
-} from "../recoil/atoms/studentAtoms";
-import Edit from "../images/edit";
-import Delete from "../images/delete";
-import DeleteModal from "./deleteModal";
+} from "../recoil/atoms/studentAtoms.tsx";
+import Edit from "../images/edit.tsx";
+import Delete from "../images/delete.tsx";
+import DeleteModal from "./deleteModal.tsx";
 
-const Dashboard = () => {
+interface StudentDataValue{
+  id?:string;
+  name?: string;
+  class?: number;
+  score?: number;
+  result?: string;
+  grade?:string;
+}
+
+const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
  const [isInputModalOpen, setInputIsModalOpen] =
     useRecoilState(inputModalState);
   const [isDeleteModalOpen, setIsDeleteModalOpen] =
     useRecoilState(deleteModalState);
   const studentsData = useRecoilValue(studentData);
-  const [hoveredRowIndex, setHoveredRowIndex] = useState(null);
+  const [hoveredRowIndex, setHoveredRowIndex] = useState<number | null>(null);
   const [editFormFlagVal, setEditFormFlag] = useRecoilState(editFormFlag);
   const modalOpen = useRecoilValue(deleteModalState);
   const [_, setStudentData] = useRecoilState(studentData);
   const [__,setClearFormFlag] = useRecoilState(clearFormValues)
   const [itemToRemoveValue, setItemToRemoveValue] =
-    useRecoilState(itemToRemove);
+    useRecoilState<StudentDataValue>(itemToRemove);
+
   const removeData = () => {
-    setStudentData(studentsData.filter((data) => data !== itemToRemoveValue));
+    setStudentData(studentsData.filter((data:any) => data !== itemToRemoveValue));
     setIsDeleteModalOpen(false);
   };
 
@@ -74,7 +84,7 @@ const Dashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {studentsData.map((e, index) => {
+            {studentsData.map((e:any, index) => {
               const isHovered = hoveredRowIndex === index;
               return (
                 <>

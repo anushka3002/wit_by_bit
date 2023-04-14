@@ -1,29 +1,30 @@
-import React from "react";
 import {
   Modal,
   ModalOverlay,
   ModalContent,
   ModalHeader,
   ModalBody,
+  useDisclosure
 } from "@chakra-ui/react";
-import { deleteModalState, itemToRemove } from "../recoil/atoms/studentAtoms";
+import { deleteModalState, itemToRemove } from "../recoil/atoms/studentAtoms.tsx";
 import { useRecoilState, useRecoilValue } from "recoil";
 
-const DeleteModal = ({ removeData }) => {
+interface DeleteModalProps {
+  removeData: () => void;
+}
+const DeleteModal:React.FC<DeleteModalProps>= ({ removeData }) => {
   const modalOpen = useRecoilValue(deleteModalState);
   const itemToRemoveValue = useRecoilValue(itemToRemove);
   const [isModalOpen, setIsModalOpen] = useRecoilState(deleteModalState);
+  const {onClose} = useDisclosure()
   
   return (
     <div>
       <Modal
         isCentered
-        padding={"0"}
-        background="[#000000]"
-        width={400}
         size={"lg"}
-        className="z-20"
         isOpen={modalOpen}
+        onClose={onClose}
         closeOnOverlayClick={true}
       >
         <ModalOverlay bg="rgba(0,0,0,0.4)">
@@ -41,7 +42,7 @@ const DeleteModal = ({ removeData }) => {
             </ModalHeader>
             <ModalBody>
               <hr className="pb-[16px]"></hr>
-              <div class="w-full">
+              <div className="w-full">
                 <p className="text-[16px] font-semibold">Are you sure you want to remove the current student from the list?</p>
                 <p className="text-[12px] font-medium text-[#7F878A] mt-6">STUDENT NAME</p>
                 <p className="mt-2 text-[14px]">{itemToRemoveValue?.name}</p>

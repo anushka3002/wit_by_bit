@@ -1,4 +1,3 @@
-import React, { useState } from 'react'
 import {
     DashboardIcon,
     DashboardIconGrey,
@@ -16,16 +15,17 @@ import {
     ResultsGrey,
     Students,
     StudentsGrey,
-  } from "../images/SvgImages";
+  } from "../images/SvgImages.tsx";
   import { useNavigate, useLocation } from "react-router-dom";
 import { useRecoilState } from 'recoil';
-import { schoolRoute } from '../recoil/atoms/studentAtoms';
-import School from '../images/school';
+import { schoolRoute } from '../recoil/atoms/studentAtoms.tsx';
+import School from '../images/school.tsx';
+import { useState } from "react";
 
-const Sidebar = () => {
-  const [schoolPageRoute, setSchoolPageRoute] = useRecoilState(schoolRoute);
+const Sidebar:React.FC = () => {
+  const [schoolPageRoute, setSchoolPageRoute] = useRecoilState<string>(schoolRoute);
 const location = useLocation()
-      const [hoveredDashboardIndex, setHoveredDashboardIndex] = useState(null);
+      const [hoveredDashboardIndex, setHoveredDashboardIndex] = useState<number| null>(null);
   const navigate = useNavigate()
 
     const sidebarContent = [

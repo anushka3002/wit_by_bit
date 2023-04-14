@@ -1,5 +1,14 @@
 import {atom} from "recoil";
 
+interface StudentDataValue{
+  id?:string;
+  name?: string;
+  class?: number;
+  score?: number;
+  result?: string;
+  grade?:string;
+}
+
 export const inputModalState = atom({
     key:"inputModalState",
     default:false
@@ -10,9 +19,9 @@ export const deleteModalState = atom({
   default:false
 })
 
-export const itemToRemove = atom({
+export const itemToRemove = atom<StudentDataValue>({
   key:"itemToRemove",
-  default:null
+  default:{}
 })
 
 export const editFormFlag = atom({
@@ -27,10 +36,10 @@ export const schoolRoute = atom({
 
 export const clearFormValues = atom({
   key:"clearFormValues",
-  default:()=>()=>console.log('Clear form function'),
+  default:false,
 })
 
-export const studentData = atom({
+export const studentData = atom<StudentDataValue[]>({
     key: "studentData",
     default: [],
     effects_UNSTABLE: [
