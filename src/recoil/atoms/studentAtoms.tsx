@@ -24,11 +24,6 @@ export const itemToRemove = atom<StudentDataValue>({
   default:{}
 })
 
-export const editFormFlag = atom({
-  key:"editFormFlag",
-  default:false
-})
-
 export const schoolRoute = atom({
   key:"schoolRoute",
   default:"Students"

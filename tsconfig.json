@@ -2,7 +2,9 @@
     "compilerOptions": {
         "allowImportingTsExtensions": true,
         "noEmit": true,
-        "jsx": "preserve"
+        "jsx": "preserve",
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports" : true
     },
    
   }

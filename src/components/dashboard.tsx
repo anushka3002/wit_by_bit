@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import StudentModal from "./studentModal.tsx";
-import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import {
   clearFormValues,
   deleteModalState,
-  editFormFlag,
   inputModalState,
   itemToRemove,
   studentData,
@@ -29,7 +28,6 @@ const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
     useRecoilState(deleteModalState);
   const studentsData = useRecoilValue(studentData);
   const [hoveredRowIndex, setHoveredRowIndex] = useState<number | null>(null);
-  const [editFormFlagVal, setEditFormFlag] = useRecoilState(editFormFlag);
   const modalOpen = useRecoilValue(deleteModalState);
   const [_, setStudentData] = useRecoilState(studentData);
   const [__,setClearFormFlag] = useRecoilState(clearFormValues)
@@ -57,7 +55,6 @@ const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
           <button
             onClick={() => {
               setInputIsModalOpen(true);
-              setEditFormFlag(false);
               setClearFormFlag(true);
             }}
             className="text-white flex px-6 justify-between py-2 bg-[#2CA4D8] rounded-[10px]"
@@ -69,7 +66,7 @@ const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
             <p className="text-[14px] font-medium">ADD</p>
           </button>
         </div>
-        <div className="h-[445px] border bg-white text-center">
+        <div className="h-[445px] border bg-white text-center overflow-y-scroll">
         <table className="table-auto w-full border rounded-[10px]">
           <thead className="bg-[#f1f4f8] border">
             <tr className="text-[14px] font-medium">
@@ -105,7 +102,7 @@ const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
                             : e.score >= 31 && e.score <= 100
                             ? "bg-[#2CBF6E]"
                             : "bg-[white]"
-                        } mx-auto focus:outline-none mb-2 rounded-[20px] text-white text-[12px] font-medium w-[70px] py-[2px] my-auto mt-1 tracking-wider`}
+                        } mx-auto focus:outline-none mb-1 rounded-[20px] text-white text-[12px] font-medium w-[70px] py-[2px] my-auto mt-1 tracking-wider`}
                       >
                         {e.result}
                       </p>
@@ -121,7 +118,7 @@ const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
                             : e.score >= 76
                             ? "text-[#2CBF6E]"
                             : "text-black"
-                        } mb-2 font-medium`}
+                        } my-auto font-medium`}
                       >
                         {e.grade}
                       </p>
@@ -131,7 +128,6 @@ const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
                         onClick={() => {
                           setInputIsModalOpen(true);
                           setItemToRemoveValue(e);
-                          setEditFormFlag(true);
                           setClearFormFlag(false);
                         }}
                         className={`${isHovered ? "visible" : "invisible"}`}

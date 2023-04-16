@@ -6,7 +6,7 @@ import {
   ModalBody,
   useDisclosure
 } from "@chakra-ui/react";
-import { clearFormValues, editFormFlag, inputModalState, itemToRemove, studentData } from "../recoil/atoms/studentAtoms.tsx";
+import { clearFormValues, inputModalState, studentData } from "../recoil/atoms/studentAtoms.tsx";
 import { useRecoilState, useRecoilValue } from "recoil";
 import {useForm} from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -27,13 +27,10 @@ interface StudentModalprops{
   itemToRemoveValue:StudentDataValue
 }
 
-
 const StudentModal:React.FC<StudentModalprops>= ({itemToRemoveValue}): React.ReactElement => {
   const modalOpen = useRecoilValue(inputModalState);
   const [isModalOpen, setIsModalOpen] = useRecoilState(inputModalState)
   const [studentDataList, setStudentData] = useRecoilState<StudentDataValue[]>(studentData);
-  // const itemToRemoveValue = useRecoilValue<StudentDataValue[]>(itemToRemove);
-  const editFormFlagVal = useRecoilValue<boolean>(editFormFlag);
   const clearFormFlag = useRecoilValue<boolean>(clearFormValues)
 
   const validationSchema = Yup.object().shape({
@@ -92,8 +89,8 @@ const StudentModal:React.FC<StudentModalprops>= ({itemToRemoveValue}): React.Rea
   },[score,setValue])
 
   useEffect(()=>{
-    reset(itemToRemoveValue)
-  },[itemToRemoveValue])
+    !clearFormFlag && reset(itemToRemoveValue)
+  },[itemToRemoveValue,clearFormFlag])
 
   const clearForm = () =>{
     setValue("name","")
@@ -105,7 +102,7 @@ const StudentModal:React.FC<StudentModalprops>= ({itemToRemoveValue}): React.Rea
   }
 
   useEffect(()=>{
-    clearFormFlag && clearForm()
+    clearFormFlag && clearForm() 
   },[clearFormFlag])
 
 
@@ -140,7 +137,7 @@ const StudentModal:React.FC<StudentModalprops>= ({itemToRemoveValue}): React.Rea
 
   const handleCancel=()=>{
     setIsModalOpen(false)
-    !editFormFlagVal && clearForm()
+    clearFormFlag && clearForm()
   }
 
   return (
@@ -168,7 +165,7 @@ const StudentModal:React.FC<StudentModalprops>= ({itemToRemoveValue}): React.Rea
             <ModalBody>
               <hr className="pb-[16px]"></hr>
               <div className="w-full">
-                <form onSubmit={handleSubmit(editFormFlagVal ? onEdit : onSubmit)} className="bg-white rounded">
+                <form onSubmit={handleSubmit(clearFormFlag ? onSubmit : onEdit)} className="bg-white rounded">
                   <div className="mb-4">
                     <label
                       className="block text-[12px] text-[#7F878A] mb-2 tracking-wider"
