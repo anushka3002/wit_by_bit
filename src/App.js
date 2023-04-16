@@ -8,6 +8,7 @@ function App() {
 
   const navigate = useNavigate()
 
+  // routing to student route directly as of now
   useEffect(()=>{
     navigate("/Students")
   },[])

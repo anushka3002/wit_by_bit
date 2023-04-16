@@ -140,6 +140,7 @@ const StudentModal:React.FC<StudentModalprops>= ({itemToRemoveValue}): React.Rea
     clearFormFlag && clearForm()
   }
 
+  // student input modal to fill information of student
   return (
     <>
       <Modal

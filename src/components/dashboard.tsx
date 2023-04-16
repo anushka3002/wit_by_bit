@@ -152,7 +152,7 @@ const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
             })}
           </tbody>
         </table>
-        {studentsData.length==0 && <p className="text-[35px] text-[#d4d4d4] text-center pt-40 font-bold">Add Data</p>}
+        {studentsData.length==0 && <p className="text-[35px] text-[#d4d4d4] text-center pt-40 font-bold">Add Student</p>}
         </div>
         <p className="text-[12px] py-4">Showing {studentsData.length} of {studentsData.length} entries</p>
       </div>

@@ -18,6 +18,7 @@ const DeleteModal:React.FC<DeleteModalProps>= ({ removeData }) => {
   const [isModalOpen, setIsModalOpen] = useRecoilState(deleteModalState);
   const {onClose} = useDisclosure()
   
+  // modal will be shown when user wants to remove student
   return (
     <div>
       <Modal
