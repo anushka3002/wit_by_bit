@@ -15,7 +15,7 @@ const SchoolPage:React.FC = () => {
           </div>
           </div>
           </div>
-          <hr className='mt-2 sm:hidden block'></hr>
+          <hr className='mt-[11px] sm:hidden block'></hr>
       <p className='text-[35px] text-[#d4d4d4] text-center pt-40 font-bold'>{selectedRoute}</p>
       </div>
   )
