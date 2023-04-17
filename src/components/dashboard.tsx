@@ -46,6 +46,27 @@ const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
     !isDeleteModalOpen && !isInputModalOpen && setHoveredRowIndex(null)
   },[isDeleteModalOpen,isInputModalOpen])
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const rowsPerPage = 3;
+
+  // Calculate the index of the first and last rows to show on the current page
+  const indexOfLastRow = currentPage * rowsPerPage;
+  const indexOfFirstRow = indexOfLastRow - rowsPerPage;
+
+  // Filtered version of the data array that only includes the rows for the current page
+  const currentRows = studentsData?.slice(indexOfFirstRow, indexOfLastRow);
+
+  // Array of page numbers to display in the pagination
+  const pageNumbers = [];
+  for (let i = 1; i <= Math.ceil(studentsData.length / rowsPerPage); i++) {
+    pageNumbers.push(i);
+  }
+
+  //To Update the current page
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  }
+
   return (
     <div className="w-full sm:mr-6 mr-2 sm:pr-[24px] pr-[10px] pt-4 bg-[#f9fcfe] h-screen sm:h-full">
       {/* modals */}
@@ -76,9 +97,8 @@ const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
             ></img>
             <p className="text-[14px] font-medium">ADD</p>
           </button>
-          {/* <button>Show sidebar</button> */}
         </div>
-        <div className="h-full sm:h-[445px] bg-white text-center overflow-y-scroll border">
+        <div className="h-full sm:h-[445px] bg-white text-center border">
         <table className="table-auto w-full border rounded-[10px]">
           <thead className="bg-[#f1f4f8] border">
             <tr className="sm:text-[14px] text-[10px] font-medium">
@@ -93,7 +113,7 @@ const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
             </tr>
           </thead>
           <tbody>
-            {studentsData.map((e:any, index) => {
+            {currentRows.map((e:any, index) => {
               const isHovered = hoveredRowIndex === index;
               return (
                 <>
@@ -103,7 +123,7 @@ const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
                     onMouseLeave={() => {(isDeleteModalOpen || isInputModalOpen)  ? setHoveredRowIndex(index) : setHoveredRowIndex(null)}}
                     className="border cursor-pointer hover:bg-[#F1F4F8] sm:text-[14px] text-[10px]"
                   >
-                    <td className="py-2 text-[#242424]">{index + 1}</td>
+                    <td className="py-2 text-[#242424]">{(currentPage-1)*3 + index+1}</td>
                     <td className="text-[14px] text-[#242424]">{e.name}</td>
                     <td>{e.class}{e.class==1 ? "st" : e.class==2 ? "nd" : e.class==3 ? "rd" : "th"}</td>
                     <td className="mx-auto">
@@ -166,7 +186,35 @@ const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
         </table>
         {studentsData.length==0 && <p className="text-[35px] text-[#d4d4d4] text-center pt-40 font-bold">Add Student</p>}
         </div>
-        <p className="text-[12px] py-4">Showing {studentsData.length} of {studentsData.length} entries</p>
+        <div className="flex justify-between">
+        <p className="text-[12px] py-4">Showing {currentRows.length} of {studentsData.length} entries</p>
+        {/* showing pagination */}
+        {studentsData.length >0 && <div className="flex justify-center my-auto">
+        <button
+          className={`text-white font-bold py-1 px-2 rounded-l ${currentPage === 1 && "cursor-not-allowed"}`}
+          disabled={currentPage === 1}
+          onClick={() => handlePageChange(currentPage - 1)}
+        >
+        <img className="w-[16px]" src="https://cdn-icons-png.flaticon.com/512/60/60775.png" alt="" />
+        </button>
+        {pageNumbers.map((pageNumber) => (
+          <button
+            key={pageNumber}
+            className={`mx-2 px-2 rounded ${currentPage === pageNumber ? 'bg-[#2ca4d8] text-white' : 'bg-gray-200 text-gray-700'}`}
+            onClick={() => handlePageChange(pageNumber)}
+          >
+            {pageNumber}
+          </button>
+        ))}
+        <button
+          className={`text-white font-bold py-1 px-2 rounded-l ${currentPage === Math.ceil(studentsData.length / rowsPerPage) && "cursor-not-allowed"}`}
+          disabled={currentPage === Math.ceil(studentsData.length / rowsPerPage)}
+          onClick={() => handlePageChange(currentPage + 1)}
+        >
+          <img className="w-[16px]" src="https://cdn-icons-png.flaticon.com/512/60/60758.png"></img>
+        </button>
+        </div>}
+      </div>
       </div>
     </div>
   );
