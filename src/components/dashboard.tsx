@@ -6,11 +6,13 @@ import {
   deleteModalState,
   inputModalState,
   itemToRemove,
+  showSidebarFlag,
   studentData,
 } from "../recoil/atoms/studentAtoms.tsx";
 import Edit from "../images/edit.tsx";
 import Delete from "../images/delete.tsx";
 import DeleteModal from "./deleteModal.tsx";
+import School from "../images/school.tsx";
 
 interface StudentDataValue{
   id?:string;
@@ -30,7 +32,8 @@ const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
   const [hoveredRowIndex, setHoveredRowIndex] = useState<number | null>(null);
   const modalOpen = useRecoilValue(deleteModalState);
   const [_, setStudentData] = useRecoilState(studentData);
-  const [__,setClearFormFlag] = useRecoilState(clearFormValues)
+  const [__,setClearFormFlag] = useRecoilState(clearFormValues);
+  const [showSidebarFlagVal, setShowSidebarFlag] = useRecoilState<boolean>(showSidebarFlag);
   const [itemToRemoveValue, setItemToRemoveValue] =
     useRecoilState<StudentDataValue>(itemToRemove);
 
@@ -44,13 +47,21 @@ const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
   },[isDeleteModalOpen,isInputModalOpen])
 
   return (
-    <div className="w-full mr-6 pr-[24px] pt-4 bg-[#f9fcfe]">
+    <div className="w-full sm:mr-6 mr-2 sm:pr-[24px] pr-[10px] pt-4 bg-[#f9fcfe] h-screen sm:h-full">
       {/* modals */}
       <StudentModal itemToRemoveValue={itemToRemoveValue} />
       <DeleteModal removeData={removeData} />
       {/* table */}
-      <div className=" w-full ml-6">
+      <div className=" w-full ml-2 sm:ml-6 h-[85%] sm:h-full">
         <div className="flex justify-between mb-4">
+        <div className="flex sm:hidden block ">
+          <img onClick={()=>setShowSidebarFlag(true)} className="w-[20px] h-[20px] my-auto" src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Hamburger_icon.svg/1024px-Hamburger_icon.svg.png"></img>
+        <div className="mt-1 ml-2 bg-[#FFBF3F] sm:p-4 p-2 rounded-[8px] sm:w-[60px] w-[30px] sm:h-[48px] h-[28px]">
+          <div className=" mx-auto mt-[-10px] flex flex-cols justify-center">
+            <School />
+          </div>
+          </div>
+          </div>
           <p className="text-[20px] font-bold">Students</p>
           <button
             onClick={() => {
@@ -65,11 +76,12 @@ const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
             ></img>
             <p className="text-[14px] font-medium">ADD</p>
           </button>
+          {/* <button>Show sidebar</button> */}
         </div>
-        <div className="h-[445px] border bg-white text-center overflow-y-scroll">
+        <div className="h-full sm:h-[445px] bg-white text-center overflow-y-scroll border">
         <table className="table-auto w-full border rounded-[10px]">
           <thead className="bg-[#f1f4f8] border">
-            <tr className="text-[14px] font-medium">
+            <tr className="sm:text-[14px] text-[10px] font-medium">
               <th className="py-1">No.</th>
               <th>Student Name</th>
               <th>Class</th>
@@ -89,7 +101,7 @@ const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
                   onClick={()=>setHoveredRowIndex(index)}
                     onMouseEnter={() => setHoveredRowIndex(index)}
                     onMouseLeave={() => {(isDeleteModalOpen || isInputModalOpen)  ? setHoveredRowIndex(index) : setHoveredRowIndex(null)}}
-                    className="border cursor-pointer hover:bg-[#F1F4F8] text-[14px]"
+                    className="border cursor-pointer hover:bg-[#F1F4F8] sm:text-[14px] text-[10px]"
                   >
                     <td className="py-2 text-[#242424]">{index + 1}</td>
                     <td className="text-[14px] text-[#242424]">{e.name}</td>
@@ -102,7 +114,7 @@ const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
                             : e.score >= 31 && e.score <= 100
                             ? "bg-[#2CBF6E]"
                             : "bg-[white]"
-                        } mx-auto focus:outline-none mb-1 rounded-[20px] text-white text-[12px] font-medium w-[70px] py-[2px] my-auto mt-1 tracking-wider`}
+                        } mx-auto focus:outline-none mb-1 rounded-[20px] text-white font-medium sm:w-[70px] w-[50px] py-[2px] my-auto mt-1 tracking-wider`}
                       >
                         {e.result}
                       </p>
@@ -130,7 +142,7 @@ const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
                           setItemToRemoveValue(e);
                           setClearFormFlag(false);
                         }}
-                        className={`${isHovered ? "visible" : "invisible"}`}
+                        className={`${isHovered ? "visible" : "sm:invisible visible"}`}
                       >
                         <Edit />
                       </span>
@@ -141,7 +153,7 @@ const Dashboard:React.FC<StudentDataValue> = (): React.ReactElement => {
                           setIsDeleteModalOpen(true);
                           setItemToRemoveValue(e);
                         }}
-                        className={`${isHovered ? "visible" : "invisible"}`}
+                        className={`${isHovered ? "visible" : "sm:invisible visible"}`}
                       >
                         <Delete />
                       </span>

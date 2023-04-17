@@ -34,6 +34,11 @@ export const clearFormValues = atom({
   default:false,
 })
 
+export const showSidebarFlag = atom({
+  key:"showSidebarFlag",
+  default:false,
+})
+
 export const studentData = atom<StudentDataValue[]>({
     key: "studentData",
     default: [],
